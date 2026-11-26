@@ -23,6 +23,7 @@ import {
   type Appearance,
   fill,
   formatMinor,
+  groupDigits,
   term,
   violationText,
   type LicensingRules,
@@ -454,7 +455,7 @@ export function RuleEditor() {
             <option value="category_based">{t.rules.categoryBased}</option>
           </select>
         </label>
-        <label className="text-sm">{t.rules.basePrice}<input className={field} inputMode="numeric" value={rules.commercial.basePriceMinor ?? ""} onChange={(event) => {
+        <label className="text-sm">{t.rules.basePrice}<input className={field} inputMode="numeric" value={rules.commercial.basePriceMinor == null ? "" : groupDigits(rules.commercial.basePriceMinor)} onChange={(event) => {
           const digits = event.target.value.replace(/\D/g, "");
           setRules((current) => ({ ...current, commercial: { ...current.commercial, basePriceMinor: digits ? Number(digits) : null } }));
         }} /></label>
