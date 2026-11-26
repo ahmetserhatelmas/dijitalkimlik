@@ -3,7 +3,15 @@ import type { Database } from "./database.js";
 
 export function createPgDatabase(connectionString: string): Database {
   const ssl = /supabase\.(co|com)|sslmode=require/.test(connectionString) ? { rejectUnauthorized: false } : undefined;
-  const pool = new pg.Pool({ connectionString, ssl, max: 3, connectionTimeoutMillis: 8000 });
+  const onVercel = Boolean(process.env.VERCEL);
+  const pool = new pg.Pool({
+    connectionString,
+    ssl,
+    max: onVercel ? 1 : 3,
+    idleTimeoutMillis: onVercel ? 1000 : 10_000,
+    connectionTimeoutMillis: 8000,
+    allowExitOnIdle: onVercel,
+  });
   return databaseFromQuery(async (sql, params) => {
     const result = await pool.query(sql, params);
     return { rows: result.rows };
