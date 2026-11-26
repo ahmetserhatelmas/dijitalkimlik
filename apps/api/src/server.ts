@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import express from "express";
-import { createApp } from "./app.js";
+import { createApp } from "./http.js";
 import { EthersChainClient } from "./chain/ethers.js";
 import { UnconfiguredChainClient } from "./chain/types.js";
 import { loadConfig } from "./config.js";

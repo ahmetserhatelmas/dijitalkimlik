@@ -7,7 +7,24 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**"],
+      "passThroughEnv": [
+        "SURET_API_URL",
+        "API_PUBLIC_URL",
+        "WEB_PUBLIC_URL",
+        "CORS_ORIGINS",
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_JWT_SECRET",
+        "DATABASE_URL",
+        "STORAGE_PROVIDER",
+        "ALLOW_DEV_AUTH",
+        "ALLOW_SANDBOX_IN_PRODUCTION",
+        "PAYMENT_PROVIDER",
+        "PAYMENT_WEBHOOK_SECRET",
+        "SEED_DEMO_DATA"
+      ]
     },
     "test": {
       "cache": false

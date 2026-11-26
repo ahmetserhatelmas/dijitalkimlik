@@ -1,7 +1,7 @@
 import { signPayload, type UsageRequest } from "@suret/shared";
 import request from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createApp } from "../src/app.js";
+import { createApp } from "../src/http.js";
 import { MemoryChainClient } from "../src/chain/ethers.js";
 import { loadConfig } from "../src/config.js";
 import { checkerPng } from "../src/images.js";

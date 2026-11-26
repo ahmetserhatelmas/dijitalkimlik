@@ -44,7 +44,11 @@ export async function POST(request: Request) {
     }, { status: 502 });
   }
   if (!response.ok) return Response.json(payload, { status: response.status });
-  (await cookies()).set("suret_token", payload.data.accessToken, {
+  const accessToken = payload.data?.accessToken;
+  if (!accessToken) {
+    return Response.json({ error: { code: "API_UNREACHABLE", message: "API oturum açmadı. Biraz sonra tekrar dene." } }, { status: 502 });
+  }
+  (await cookies()).set("suret_token", accessToken, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

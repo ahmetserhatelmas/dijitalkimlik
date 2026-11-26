@@ -15,7 +15,8 @@
     },
     "api": {
       "root": "apps/api",
-      "framework": "express"
+      "framework": "express",
+      "entrypoint": "src/server.ts"
     }
   },
   "rewrites": [
