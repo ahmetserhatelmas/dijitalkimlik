@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { apiOrigin } from "@/lib/api";
 
+type LoginPayload = {
+  data?: { accessToken?: string; profile?: unknown; roles?: string[] };
+  error?: { message?: string };
+};
+
 function safeHost(origin: string): string {
   try {
     return new URL(origin).host;
@@ -9,9 +14,9 @@ function safeHost(origin: string): string {
   }
 }
 
-function parseJson(raw: string): { data?: { accessToken?: string; profile?: unknown; roles?: string[] }; error?: { message?: string } } | null {
+function parseJson(raw: string): LoginPayload | null {
   try {
-    return JSON.parse(raw) as { data?: { accessToken?: string; profile?: unknown; roles?: string[] }; error?: { message?: string } };
+    return JSON.parse(raw) as LoginPayload;
   } catch {
     return null;
   }
@@ -28,13 +33,15 @@ export async function POST(request: Request) {
       body,
     });
   } catch (error) {
-    const host = safeHost(origin);
     const reason = error instanceof Error ? error.message : "fetch failed";
-    return Response.json({ error: { code: "API_UNREACHABLE", message: "API'ye ulaşılamadı. Biraz sonra tekrar dene.", details: { host, reason } } }, { status: 502 });
+    return Response.json({ error: { code: "API_UNREACHABLE", message: "API'ye ulaşılamadı. Biraz sonra tekrar dene.", details: { host: safeHost(origin), reason } } }, { status: 502 });
   }
   const raw = await response.text();
   const payload = parseJson(raw);
-  if (!payload) {
+  const data = payload?.data;
+  const accessToken = data?.accessToken;
+  if (!response.ok || !payload || !data || !accessToken) {
+    if (payload) return Response.json(payload, { status: response.ok ? 502 : response.status });
     return Response.json({
       error: {
         code: "API_UNREACHABLE",
@@ -43,11 +50,6 @@ export async function POST(request: Request) {
       },
     }, { status: 502 });
   }
-  if (!response.ok) return Response.json(payload, { status: response.status });
-  const accessToken = payload.data?.accessToken;
-  if (!accessToken) {
-    return Response.json({ error: { code: "API_UNREACHABLE", message: "API oturum açmadı. Biraz sonra tekrar dene." } }, { status: 502 });
-  }
   (await cookies()).set("suret_token", accessToken, {
     httpOnly: true,
     sameSite: "lax",
@@ -55,5 +57,5 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: 60 * 60 * 12,
   });
-  return Response.json({ data: { profile: payload.data.profile, roles: payload.data.roles } });
+  return Response.json({ data: { profile: data.profile, roles: data.roles } });
 }
