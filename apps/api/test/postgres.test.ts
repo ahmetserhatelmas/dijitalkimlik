@@ -16,6 +16,7 @@ describe("postgres schema", () => {
     await db.exec(readFileSync(path.join(migrationsDir, "20261016000000_asset_subject.sql"), "utf8"));
     await db.exec(readFileSync(path.join(migrationsDir, "20261016010000_asset_listed.sql"), "utf8"));
     await db.exec(readFileSync(path.join(migrationsDir, "20261126000000_profile_appearance.sql"), "utf8"));
+    await db.exec(readFileSync(path.join(migrationsDir, "20261126010000_profile_place.sql"), "utf8"));
     const repository = new PostgresRepository(wrap(db));
     const ownerId = crypto.randomUUID();
     const otherId = crypto.randomUUID();
@@ -26,6 +27,7 @@ describe("postgres schema", () => {
       displayName: "Owner",
       bio: "",
       location: null,
+      place: { country: null, province: null },
       companyName: null,
       appearance: { gender: null, ageRange: null, heightRange: null, hairColor: null, eyeColor: null },
       verificationStatus: "verified" as const,

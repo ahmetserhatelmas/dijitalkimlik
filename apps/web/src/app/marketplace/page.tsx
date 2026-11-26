@@ -1,4 +1,4 @@
-import { formatMinor, term, type Appearance, type Currency } from "@suret/shared";
+import { formatMinor, term, type Appearance, type Currency, type Place } from "@suret/shared";
 import { CastGrid } from "@/components/cast-grid";
 import { PageIntro, SiteFooter, SiteHeader } from "@/components/shell";
 import { apiOrigin } from "@/lib/api";
@@ -11,6 +11,7 @@ type Card = {
   subject: "face" | "place" | "object";
   imageUrl: string | null;
   appearance: Appearance | null;
+  place: Place | null;
   permittedCategories: string[];
   commercial: { pricingMode: string; currency: Currency; basePriceMinor: number | null };
 };
@@ -52,9 +53,11 @@ export default async function MarketplacePage() {
               caption: card.caption,
               imageUrl: card.imageUrl,
               appearance: card.appearance,
+              place: card.place,
               price: priceLabel(card, t.marketplace.negotiable, locale),
             }))}
             labels={t.appearance as Record<string, string> & typeof t.appearance}
+            placeLabels={{ country: t.profile.country, province: t.profile.province }}
             noMatch={t.marketplace.noMatch}
           />
         )}

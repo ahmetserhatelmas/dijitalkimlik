@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { AUDIT_GENESIS, DEFAULT_SETTINGS, nextAuditHash, type AuditLog, type PlatformSettings } from "@suret/shared";
+import { AUDIT_GENESIS, DEFAULT_SETTINGS, blankPlace, formatPlace, nextAuditHash, placeFromLegacy, type AuditLog, type PlatformSettings, type Profile } from "@suret/shared";
 import { FAKE_WALLET_START_MINOR } from "../wallet.js";
 import type { AppRepository } from "./types.js";
 
@@ -135,16 +135,16 @@ export class MemoryRepository implements AppRepository {
   }
 
   async getProfile(id: string) {
-    return clone(this.state.profiles.find((item) => item.id === id) ?? null);
+    return withPlace(clone(this.state.profiles.find((item) => item.id === id) ?? null));
   }
 
   async getProfileByEmail(email: string) {
     const match = this.state.profiles.find((item) => item.email.toLowerCase() === email.toLowerCase());
-    return clone(match ?? null);
+    return withPlace(clone(match ?? null));
   }
 
   async listProfiles() {
-    return clone(this.state.profiles);
+    return clone(this.state.profiles).map((profile) => withPlace(profile) as Profile);
   }
 
   async getPasswordHash(userId: string) {
@@ -602,4 +602,14 @@ export class MemoryRepository implements AppRepository {
   async listDeletionRequests() {
     return clone(this.state.deletions);
   }
+}
+
+function withPlace<T extends Profile | null>(profile: T): T {
+  if (!profile) return profile;
+  if (!profile.place?.country) {
+    const resolved = placeFromLegacy(profile.location);
+    profile.place = resolved.country ? resolved : profile.place ?? blankPlace();
+    if (resolved.country) profile.location = formatPlace(resolved, "tr");
+  }
+  return profile;
 }

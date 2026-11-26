@@ -13,8 +13,13 @@ import {
   SUGGESTED_PROHIBITIONS,
   USAGE_CATEGORIES,
   AI_PERMISSION_KEYS,
+  COUNTRIES,
   blankAppearance,
+  blankPlace,
   blankRules,
+  formatPlace,
+  provincesOf,
+  type Place,
   type Appearance,
   fill,
   formatMinor,
@@ -49,17 +54,33 @@ export function OwnerHome() {
 export function ProfileForm() {
   const session = useSession();
   const t = useCopy();
+  const locale = useLocale();
   const [message, setMessage] = useState("");
   const [appearance, setAppearance] = useState<Appearance>(blankAppearance());
+  const [place, setPlace] = useState<Place>(blankPlace());
   useEffect(() => {
-    api<{ profile: { appearance?: Appearance } }>("me")
-      .then((me) => setAppearance(me.profile.appearance ?? blankAppearance()))
-      .catch(() => setAppearance(blankAppearance()));
+    api<{ profile: { appearance?: Appearance; place?: Place } }>("me")
+      .then((me) => {
+        setAppearance(me.profile.appearance ?? blankAppearance());
+        setPlace(me.profile.place ?? blankPlace());
+      })
+      .catch(() => {
+        setAppearance(blankAppearance());
+        setPlace(blankPlace());
+      });
   }, []);
   if (!session) return null;
   const actor = session.roles.includes("face_owner");
+  const provinces = provincesOf(place.country);
   function choose<K extends keyof Appearance>(key: K, value: string) {
     setAppearance((current) => ({ ...current, [key]: (value || null) as Appearance[K] }));
+  }
+  function chooseCountry(value: string) {
+    setPlace((current) => {
+      const country = value || null;
+      const province = provincesOf(country).some((item) => item.code === current.province) ? current.province : null;
+      return { country, province };
+    });
   }
   return (
     <form
@@ -72,7 +93,7 @@ export function ProfileForm() {
           body: JSON.stringify({
             displayName: form.get("displayName"),
             bio: form.get("bio"),
-            location: form.get("location"),
+            place,
             ...(actor ? { appearance } : {}),
           }),
         });
@@ -82,7 +103,8 @@ export function ProfileForm() {
       <h1 className="text-4xl">{t.profile.title}</h1>
       <label className="block text-sm">{t.profile.name}<input className={field} name="displayName" defaultValue={session.profile.displayName} required /></label>
       <label className="block text-sm">{t.profile.bio}<textarea className={field} name="bio" rows={4} /></label>
-      <label className="block text-sm">{t.profile.location}<input className={field} name="location" /></label>
+      <TraitSelect label={t.profile.country} value={place.country} unset={t.appearance.unset} options={COUNTRIES.map((country) => country.code)} text={(id) => COUNTRIES.find((country) => country.code === id)?.[locale] ?? id} onChange={chooseCountry} />
+      <TraitSelect label={t.profile.province} value={place.province} unset={t.appearance.unset} options={provinces.map((province) => province.code)} text={(id) => provinces.find((province) => province.code === id)?.[locale] ?? id} onChange={(value) => setPlace((current) => ({ ...current, province: value || null }))} />
       {actor && (
         <fieldset className="space-y-3">
           <legend className="text-lg font-semibold">{t.appearance.title}</legend>
@@ -639,12 +661,13 @@ type BoughtAgreement = {
 
 export function ProducerAccount() {
   const t = useCopy();
+  const locale = useLocale();
   const session = useSession();
-  const [profile, setProfile] = useState<{ displayName: string; email: string; companyName: string | null; bio: string; location: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ displayName: string; email: string; companyName: string | null; bio: string; location: string | null; place?: Place } | null>(null);
   const [rows, setRows] = useState<BoughtAgreement[]>([]);
   const [photos, setPhotos] = useState<Record<string, string>>({});
   useEffect(() => {
-    api<{ profile: { displayName: string; email: string; companyName: string | null; bio: string; location: string | null } }>("me").then((me) => setProfile(me.profile)).catch(() => setProfile(null));
+    api<{ profile: { displayName: string; email: string; companyName: string | null; bio: string; location: string | null; place?: Place } }>("me").then((me) => setProfile(me.profile)).catch(() => setProfile(null));
     api<BoughtAgreement[]>("agreements").then(setRows).catch(() => setRows([]));
     api<Array<{ assetId: string; imageUrl: string | null }>>("marketplace/faces").then((cards) => {
       const next: Record<string, string> = {};
@@ -662,7 +685,7 @@ export function ProducerAccount() {
         <h1 className="mt-1 text-4xl">{profile?.displayName ?? session?.profile.displayName}</h1>
         <p className="mt-2 text-muted">{profile?.email ?? session?.profile.email}</p>
         {profile?.companyName && <p className="mt-1 text-sm">{profile.companyName}</p>}
-        {profile?.location && <p className="text-sm text-muted">{profile.location}</p>}
+        {(formatPlace(profile?.place, locale) || profile?.location) && <p className="text-sm text-muted">{formatPlace(profile?.place, locale) || profile?.location}</p>}
         {profile?.bio && <p className="mt-3 max-w-xl text-sm">{profile.bio}</p>}
       </div>
       <section>

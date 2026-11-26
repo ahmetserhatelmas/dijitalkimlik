@@ -110,6 +110,10 @@ export const profilePatchSchema = z.object({
   displayName: z.string().trim().min(2).max(120).optional(),
   bio: z.string().trim().max(2000).optional(),
   location: z.string().trim().max(120).nullable().optional(),
+  place: z.object({
+    country: z.string().nullable(),
+    province: z.string().nullable(),
+  }).optional(),
   companyName: z.string().trim().max(160).nullable().optional(),
   appearance: appearanceSchema.optional(),
   privacy: z

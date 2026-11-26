@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { formatMinor, term, type Appearance, type Currency } from "@suret/shared";
+import { formatMinor, formatPlace, term, type Appearance, type Currency, type Place } from "@suret/shared";
 import { DiscoverRequest } from "@/components/workspace";
 import { SiteFooter, SiteHeader } from "@/components/shell";
 import { apiOrigin } from "@/lib/api";
@@ -14,6 +14,7 @@ type Card = {
   subject: "face" | "place" | "object";
   imageUrl: string | null;
   appearance: Appearance | null;
+  place: Place | null;
   permittedCategories: string[];
   prohibitedCategories: string[];
   customProhibitions: string[];
@@ -55,6 +56,7 @@ export default async function FacePage({ params }: { params: Promise<{ id: strin
           <div>
             <p className="text-sm font-semibold text-accent">{t.marketplace.subjects[card.subject]}</p>
             <h1 className="mt-2 text-5xl">{card.displayName}</h1>
+            {formatPlace(card.place, locale) && <p className="mt-2 text-muted">{formatPlace(card.place, locale)}</p>}
             <TraitLine appearance={card.appearance} labels={t.appearance as { [key: string]: string }} />
             <p className="mt-4 text-lg text-muted">{card.caption}</p>
             <p className="mt-6 text-sm text-muted">{t.marketplace.price}</p>

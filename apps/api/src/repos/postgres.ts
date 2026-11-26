@@ -7,6 +7,8 @@ import {
   HAIR_COLORS,
   HEIGHT_RANGES,
   blankAppearance,
+  blankPlace,
+  readPlace,
   nextAuditHash,
   type Agency,
   type AuditLog,
@@ -50,11 +52,13 @@ export class PostgresRepository implements AppRepository {
   async insertProfile(profile: Profile, passwordHash: string | null): Promise<void> {
     await this.db.query(
       `insert into profiles (
-        id, email, display_name, bio, location, company_name, appearance, verification_status, email_verified,
+        id, email, display_name, bio, location, place, company_name, appearance, verification_status, email_verified,
         privacy, deletion_requested_at, suspended_at, created_at, updated_at
-      ) values ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::verification_status,$9,$10::jsonb,$11,$12,$13,$14)`,
+      ) values ($1,$2,$3,$4,$5,$6::jsonb,$7,$8::jsonb,$9::verification_status,$10,$11::jsonb,$12,$13,$14,$15)`,
       [
-        profile.id, profile.email, profile.displayName, profile.bio, profile.location, profile.companyName,
+        profile.id, profile.email, profile.displayName, profile.bio, profile.location,
+        JSON.stringify(profile.place ?? blankPlace()),
+        profile.companyName,
         JSON.stringify(profile.appearance ?? blankAppearance()),
         profile.verificationStatus, profile.emailVerified, JSON.stringify(profile.privacy),
         profile.deletionRequestedAt, profile.suspendedAt, profile.createdAt, profile.updatedAt,
@@ -65,11 +69,13 @@ export class PostgresRepository implements AppRepository {
 
   async updateProfile(profile: Profile): Promise<void> {
     await this.db.query(
-      `update profiles set email=$2, display_name=$3, bio=$4, location=$5, company_name=$6, appearance=$7::jsonb,
-        verification_status=$8::verification_status, email_verified=$9, privacy=$10::jsonb,
-        deletion_requested_at=$11, suspended_at=$12, updated_at=$13 where id=$1`,
+      `update profiles set email=$2, display_name=$3, bio=$4, location=$5, place=$6::jsonb, company_name=$7, appearance=$8::jsonb,
+        verification_status=$9::verification_status, email_verified=$10, privacy=$11::jsonb,
+        deletion_requested_at=$12, suspended_at=$13, updated_at=$14 where id=$1`,
       [
-        profile.id, profile.email, profile.displayName, profile.bio, profile.location, profile.companyName,
+        profile.id, profile.email, profile.displayName, profile.bio, profile.location,
+        JSON.stringify(profile.place ?? blankPlace()),
+        profile.companyName,
         JSON.stringify(profile.appearance ?? blankAppearance()),
         profile.verificationStatus, profile.emailVerified, JSON.stringify(profile.privacy),
         profile.deletionRequestedAt, profile.suspendedAt, profile.updatedAt,
@@ -728,6 +734,7 @@ export class PostgresRepository implements AppRepository {
       displayName: String(row.display_name),
       bio: String(row.bio),
       location: row.location ? String(row.location) : null,
+      place: readPlace(row.place, row.location ? String(row.location) : null),
       companyName: row.company_name ? String(row.company_name) : null,
       appearance: readAppearance(row.appearance),
       verificationStatus: String(row.verification_status) as Profile["verificationStatus"],

@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { AGE_RANGES, EYE_COLORS, HAIR_COLORS, HEIGHT_RANGES, blankRules, emptyAiPermissions, type Appearance, type LicensingRules, type UsageCategory } from "@suret/shared";
+import { AGE_RANGES, EYE_COLORS, HAIR_COLORS, HEIGHT_RANGES, blankRules, emptyAiPermissions, formatPlace, placeFromLegacy, type Appearance, type LicensingRules, type Place, type UsageCategory } from "@suret/shared";
 import type { AppConfig } from "./config.js";
 import type { AppRepository } from "./repos/types.js";
 import type { AccountService } from "./services/accounts.js";
@@ -32,10 +32,17 @@ export async function seedDemoCast(input: {
     const email = `oyuncu${String(index + 1).padStart(2, "0")}@suret.dev`;
     const current = existing.get(email);
     if (current) {
+      let changed = false;
       if (!current.appearance) {
         current.appearance = appearanceFor(index);
-        await input.repo.updateProfile(current);
+        changed = true;
       }
+      if (!current.place?.country) {
+        current.place = placeFor(index);
+        current.location = formatPlace(current.place, "tr");
+        changed = true;
+      }
+      if (changed) await input.repo.updateProfile(current);
       continue;
     }
     const photo = path.join(portraitDir, `${index < 12 ? "kadin" : "erkek"}-${String((index % 12) + 1).padStart(2, "0")}.jpg`);
@@ -52,8 +59,10 @@ export async function seedDemoCast(input: {
     const profile = registered.profile;
     profile.emailVerified = true;
     profile.verificationStatus = "verified";
+    const place = placeFor(index);
     profile.bio = `${cities[index % cities.length]} merkezli oyuncu. Proje bazında benzerlik lisansı verir.`;
-    profile.location = cities[index % cities.length];
+    profile.place = place;
+    profile.location = formatPlace(place, "tr");
     profile.privacy = { discoverable: true, showPreviewToProducers: true, showLegalName: false };
     profile.appearance = appearanceFor(index);
     await input.repo.updateProfile(profile);
@@ -75,6 +84,10 @@ export async function seedDemoCast(input: {
       statement: "Bu fotoğraftaki kişiyim ve bu benzerliği lisanslama yetkim var.",
     });
   }
+}
+
+function placeFor(index: number): Place {
+  return placeFromLegacy(cities[index % cities.length]);
 }
 
 function appearanceFor(index: number): Appearance {

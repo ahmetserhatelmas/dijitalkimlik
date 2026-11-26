@@ -1,4 +1,5 @@
 export * from "./domain";
+export * from "./places";
 export * from "./schemas";
 export * from "./integrity";
 export * from "./licensing";

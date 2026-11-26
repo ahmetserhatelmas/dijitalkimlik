@@ -211,6 +211,7 @@ export class AssetService {
         displayName: profile.displayName,
         bio: profile.bio,
         location: profile.location,
+        place: profile.place,
         appearance: profile.appearance ?? blankAppearance(),
         subject,
         caption: asset.caption?.trim() || profile.bio,

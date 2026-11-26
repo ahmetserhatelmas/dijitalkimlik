@@ -51,7 +51,8 @@ export async function seedDemoData(input: {
   ownerProfile.emailVerified = true;
   ownerProfile.verificationStatus = "verified";
   ownerProfile.bio = "Projeye özel ticari benzerlik lisansları için uygun oyuncu.";
-  ownerProfile.location = "İstanbul";
+  ownerProfile.place = { country: "TR", province: "TR-34" };
+  ownerProfile.location = "İstanbul, Türkiye";
   ownerProfile.privacy = { discoverable: true, showPreviewToProducers: true, showLegalName: false };
   await input.repo.updateProfile(ownerProfile);
   for (const profile of [producer.profile, agencyUser.profile, admin.profile]) {

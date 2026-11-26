@@ -1,3 +1,5 @@
+import type { Place } from "./places";
+
 export const ROLES = ["face_owner", "producer", "agency_member", "admin"] as const;
 export type Role = (typeof ROLES)[number];
 
@@ -214,6 +216,7 @@ export type Profile = {
   displayName: string;
   bio: string;
   location: string | null;
+  place: Place;
   companyName: string | null;
   appearance: Appearance;
   verificationStatus: VerificationStatus;

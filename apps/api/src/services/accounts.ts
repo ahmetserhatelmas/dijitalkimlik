@@ -1,5 +1,9 @@
 import {
   blankAppearance,
+  blankPlace,
+  formatPlace,
+  isCountry,
+  isProvince,
   agencyCreateSchema,
   loginSchema,
   profilePatchSchema,
@@ -41,6 +45,7 @@ export class AccountService {
       displayName: body.displayName,
       bio: "",
       location: null,
+      place: blankPlace(),
       companyName: body.companyName ?? null,
       appearance: blankAppearance(),
       verificationStatus: "unverified",
@@ -117,6 +122,12 @@ export class AccountService {
     if (patch.displayName) profile.displayName = patch.displayName;
     if (patch.bio !== undefined) profile.bio = patch.bio;
     if (patch.location !== undefined) profile.location = patch.location;
+    if (patch.place) {
+      const country = isCountry(patch.place.country) ? patch.place.country : null;
+      const province = isProvince(country, patch.place.province) ? patch.place.province : null;
+      profile.place = { country, province };
+      profile.location = formatPlace(profile.place, "tr");
+    }
     if (patch.companyName !== undefined) profile.companyName = patch.companyName;
     if (!profile.appearance) profile.appearance = blankAppearance();
     if (patch.appearance) profile.appearance = patch.appearance;
