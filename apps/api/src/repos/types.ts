@@ -93,6 +93,7 @@ export interface AppRepository {
   listRuleSets(profileId?: string): Promise<RuleSet[]>;
   insertRuleVersion(version: RuleVersion): Promise<void>;
   getRuleVersion(id: string): Promise<RuleVersion | null>;
+  getRuleVersions(ids: string[]): Promise<RuleVersion[]>;
   listRuleVersions(ruleSetId: string): Promise<RuleVersion[]>;
   insertProject(project: Project): Promise<void>;
   updateProject(project: Project): Promise<void>;

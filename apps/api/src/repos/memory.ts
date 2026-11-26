@@ -289,6 +289,11 @@ export class MemoryRepository implements AppRepository {
     return clone(this.state.ruleVersions.find((item) => item.id === id) ?? null);
   }
 
+  async getRuleVersions(ids: string[]) {
+    const wanted = new Set(ids);
+    return clone(this.state.ruleVersions.filter((item) => wanted.has(item.id)));
+  }
+
   async listRuleVersions(ruleSetId: string) {
     return clone(this.state.ruleVersions.filter((item) => item.ruleSetId === ruleSetId));
   }

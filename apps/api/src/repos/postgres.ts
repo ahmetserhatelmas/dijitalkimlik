@@ -301,6 +301,12 @@ export class PostgresRepository implements AppRepository {
     return row ? this.mapRuleVersion(row) : null;
   }
 
+  async getRuleVersions(ids: string[]) {
+    if (ids.length === 0) return [];
+    const result = await this.db.query("select * from licensing_rule_versions where id = any($1::uuid[])", [ids]);
+    return result.rows.map((row) => this.mapRuleVersion(row));
+  }
+
   async listRuleVersions(ruleSetId: string) {
     const result = await this.db.query(
       "select * from licensing_rule_versions where rule_set_id=$1 order by version_number",

@@ -3,7 +3,7 @@ import type { Database } from "./database.js";
 
 export function createPgDatabase(connectionString: string): Database {
   const ssl = /supabase\.(co|com)|sslmode=require/.test(connectionString) ? { rejectUnauthorized: false } : undefined;
-  const pool = new pg.Pool({ connectionString, ssl, connectionTimeoutMillis: 8000 });
+  const pool = new pg.Pool({ connectionString, ssl, max: 3, connectionTimeoutMillis: 8000 });
   return databaseFromQuery(async (sql, params) => {
     const result = await pool.query(sql, params);
     return { rows: result.rows };

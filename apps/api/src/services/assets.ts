@@ -230,8 +230,8 @@ export class AssetService {
       candidates.push({ asset, profile, ruleSet, versionId: ruleSet.currentVersionId });
     }
     const versionIds = [...new Set(candidates.map((item) => item.versionId))];
-    const versions = await Promise.all(versionIds.map((id) => this.repo.getRuleVersion(id)));
-    const versionById = new Map(versions.flatMap((version, index) => (version ? [[versionIds[index], version] as const] : [])));
+    const versions = await this.repo.getRuleVersions(versionIds);
+    const versionById = new Map(versions.map((version) => [version.id, version] as const));
     const imageUrls = await Promise.all(candidates.map((item) => this.cachedSignedUrl(item.asset.storagePath)));
     return candidates.flatMap((item, index) => {
       const version = versionById.get(item.versionId);
