@@ -9,7 +9,7 @@ export default function WelcomeScreen() {
     <View style={[styles.screen, { justifyContent: "space-between", paddingTop: 72, paddingBottom: 36 }]}>
       <LanguageSwitch />
       <View>
-        <Text style={[styles.title, { fontSize: 56, marginBottom: 12 }]}>Suret</Text>
+        <Text style={[styles.title, { fontSize: 56, marginBottom: 12 }]}>Dijital Kimlik</Text>
         <Text style={styles.body}>{t.mobile.welcome}</Text>
       </View>
       <View>

@@ -897,7 +897,7 @@ export function DiscoverRequest({ assetId, channels = [], territories = [], cate
   const t = useCopy();
   const locale = useLocale();
   const router = useRouter();
-  const [companyName, setCompanyName] = useState("Suret");
+  const [companyName, setCompanyName] = useState("Dijital Kimlik");
   const [result, setResult] = useState<string>("");
   const [error, setError] = useState("");
   const [amount, setAmount] = useState(() => moneyText(suggestedAmount.replace(".", ",")));
@@ -907,7 +907,7 @@ export function DiscoverRequest({ assetId, channels = [], territories = [], cate
   const endsOn = end.toISOString().slice(0, 10);
   useEffect(() => {
     api<{ profile: { companyName: string | null; displayName: string } }>("me")
-      .then((me) => setCompanyName(me.profile.companyName || me.profile.displayName || "Suret"))
+      .then((me) => setCompanyName(me.profile.companyName || me.profile.displayName || "Dijital Kimlik"))
       .catch(() => undefined);
   }, []);
   return (
@@ -1081,7 +1081,7 @@ export function AgreementDesk({ id }: { id: string }) {
         <StatusPill value={agreement.status} />
       </div>
       <article className="rounded-3xl border border-line bg-white p-6 shadow-sm md:p-8">
-        <p className="text-sm font-semibold text-accent">Suret</p>
+        <p className="text-sm font-semibold text-accent">Dijital Kimlik</p>
         <div className="mt-6 space-y-5">
           {sections.map((section) => (
             <section key={section.title}>
@@ -1099,11 +1099,11 @@ export function AgreementDesk({ id }: { id: string }) {
             try {
               const { downloadAgreementPdf } = await import("@/lib/agreement-pdf");
               await downloadAgreementPdf({
-                brand: "Suret",
+                brand: "Dijital Kimlik",
                 title: t.agreement.heading,
                 sections,
                 footer: `${t.agreement.hash} ${agreement.documentHash}`,
-                filename: locale === "en" ? "suret-agreement.pdf" : "suret-sozlesme.pdf",
+                filename: locale === "en" ? "dijital-kimlik-agreement.pdf" : "dijital-kimlik-sozlesme.pdf",
               });
             } catch {
               setError(t.agreement.pdfFailed);
@@ -1215,7 +1215,7 @@ export function AgreementDesk({ id }: { id: string }) {
               const objectUrl = URL.createObjectURL(blob);
               const link = document.createElement("a");
               link.href = objectUrl;
-              link.download = `suret-orijinal.${extension}`;
+              link.download = `dijital-kimlik-orijinal.${extension}`;
               document.body.appendChild(link);
               link.click();
               link.remove();

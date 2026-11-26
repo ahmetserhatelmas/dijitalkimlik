@@ -19,7 +19,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
-        <Link href={session ? accountPath(session.roles) : "/"} className="text-xl font-semibold tracking-tight text-ink">Suret</Link>
+        <Link href={session ? accountPath(session.roles) : "/"} className="text-xl font-semibold tracking-tight text-ink">Dijital Kimlik</Link>
         <nav aria-label="Primary" className="flex items-center gap-2 text-sm">
           <Link href="/marketplace" className="hidden rounded-full px-3 py-2 text-muted hover:text-ink sm:inline">{t.nav.marketplace}</Link>
           {producer && <Link href="/producer/requests" className="hidden rounded-full px-3 py-2 text-muted hover:text-ink md:inline">{t.dash.requests}</Link>}
@@ -46,7 +46,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-base font-semibold text-ink">Suret</p>
+          <p className="text-base font-semibold text-ink">Dijital Kimlik</p>
           <p className="mt-1 max-w-md">{t.footer.blurb}</p>
         </div>
         <div className="flex gap-4">

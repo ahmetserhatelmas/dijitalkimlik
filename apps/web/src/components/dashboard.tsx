@@ -56,7 +56,7 @@ export function Dashboard({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto grid min-h-screen max-w-6xl gap-8 px-5 py-8 md:grid-cols-[240px_1fr]">
       <aside className="h-fit rounded-3xl border border-line bg-white p-5">
-        <Link href="/" className="text-xl font-semibold">Suret</Link>
+        <Link href="/" className="text-xl font-semibold">Dijital Kimlik</Link>
         <p className="mt-4 text-sm font-medium">{session.profile.displayName}</p>
         <p className="text-xs text-muted">{session.profile.email}</p>
         {!session.profile.emailVerified && <Link href="/verify-email" className="mt-2 block text-xs text-accent">{t.dash.verifyEmail}</Link>}

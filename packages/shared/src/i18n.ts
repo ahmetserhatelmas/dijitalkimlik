@@ -16,7 +16,7 @@ export function localeFromHeader(value: string | null | undefined): Locale {
 
 const tr = {
   meta: {
-    title: "Suret — oyuncu ve yapımcı",
+    title: "Dijital Kimlik — oyuncu ve yapımcı",
     description: "Oyuncu fotoğrafını, iznini ve fiyatını belirler. Yapımcı ilanları görüp işi seçer.",
   },
   language: { label: "Dil", tr: "Türkçe", en: "English" },
@@ -85,7 +85,7 @@ const tr = {
   pricing: {
     eyebrow: "Ücretlendirme",
     title: "Ticari koşulları her kişi kendisi belirler.",
-    lede: "Suret tek bir tarife dayatmaz. Sabit fiyat, pazarlıklı teklif veya kategori fiyatları kural setindeki seçimlerdir.",
+    lede: "Dijital Kimlik tek bir tarife dayatmaz. Sabit fiyat, pazarlıklı teklif veya kategori fiyatları kural setindeki seçimlerdir.",
     paragraphs: [
       "Sabit fiyatlar sunucuda hesaplanır. Yapımcı daha düşük bir tutar yazamaz.",
       "Pazarlıklı fiyatta teklif gerekir. İsteği onaylamak, teklifi sözleşmeye alır.",
@@ -194,7 +194,7 @@ const tr = {
     none: "yok",
     explanation: "Karma eşleşmesi, sunulan sözleşme metninin kaydedilen metin olduğunu gösterir. Kimliği, mülkiyeti veya lisansın hâlâ etkin olduğunu kanıtlamaz. Güncel durum platformda tutulur ve ayrı gösterilir.",
   },
-  notFound: { title: "Bu sayfa burada değil.", back: "Suret’e dön" },
+  notFound: { title: "Bu sayfa burada değil.", back: "Dijital Kimlik’e dön" },
   dash: {
     loading: "Hesabınız yükleniyor…",
     signInPrompt: "Devam etmek için giriş yapın.",
@@ -747,7 +747,7 @@ const tr = {
 
 const en: typeof tr = {
   meta: {
-    title: "Suret — actors and producers",
+    title: "Dijital Kimlik — actors and producers",
     description: "An actor sets their photo, permissions, and price. A producer browses the listings and chooses a job.",
   },
   language: { label: "Language", tr: "Türkçe", en: "English" },
@@ -816,7 +816,7 @@ const en: typeof tr = {
   pricing: {
     eyebrow: "Pricing",
     title: "Each person sets the commercial terms.",
-    lede: "Suret does not impose one rate card. A fixed price, a negotiable proposal, or category prices are choices on the rule set.",
+    lede: "Dijital Kimlik does not impose one rate card. A fixed price, a negotiable proposal, or category prices are choices on the rule set.",
     paragraphs: [
       "Fixed prices are calculated on the server. A producer cannot substitute a lower amount.",
       "Negotiable prices require a proposal. Approving the request accepts that proposal into the agreement.",
@@ -925,7 +925,7 @@ const en: typeof tr = {
     none: "none",
     explanation: "A hash match shows that the presented agreement text is the text that was recorded. It does not prove identity, ownership, or that the license is still active. Current status is stored by the platform and is shown separately.",
   },
-  notFound: { title: "That page is not here.", back: "Back to Suret" },
+  notFound: { title: "That page is not here.", back: "Back to Dijital Kimlik" },
   dash: {
     loading: "Loading your account…",
     signInPrompt: "Sign in to continue.",

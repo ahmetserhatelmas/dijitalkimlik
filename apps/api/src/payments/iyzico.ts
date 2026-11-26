@@ -27,7 +27,7 @@ export class IyzicoPaymentProvider implements PaymentProvider {
       callbackUrl: this.options.callbackUrl,
       buyer: {
         id: input.paymentId,
-        name: "Suret",
+        name: "Dijital Kimlik",
         surname: "Licensee",
         email: input.buyerEmail,
         identityNumber: "00000000000",
@@ -35,7 +35,7 @@ export class IyzicoPaymentProvider implements PaymentProvider {
         city: "Istanbul",
         country: "Turkey",
       },
-      billingAddress: { contactName: "Suret Licensee", city: "Istanbul", country: "Turkey", address: "Not collected" },
+      billingAddress: { contactName: "Dijital Kimlik", city: "Istanbul", country: "Turkey", address: "Not collected" },
       basketItems: [
         {
           id: input.agreementId,

@@ -214,7 +214,7 @@ export function createApp(runtime: AppRuntime): {
     res.setHeader("cross-origin-resource-policy", "cross-origin");
     res.setHeader("cache-control", "private, max-age=60");
     if (req.query.download === "1") {
-      res.setHeader("content-disposition", `attachment; filename="suret-orijinal.${extension}"`);
+      res.setHeader("content-disposition", `attachment; filename="dijital-kimlik-orijinal.${extension}"`);
     }
     res.send(Buffer.from(file.body));
   }));
