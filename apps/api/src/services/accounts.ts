@@ -265,13 +265,9 @@ export class AccountService {
       headers: { apikey: this.config.supabaseAnonKey, "content-type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const body = await response.json().catch(() => ({})) as { access_token?: string; user?: { id?: string }; error?: string; error_code?: string; msg?: string; message?: string };
+    const body = await response.json().catch(() => ({})) as { access_token?: string; user?: { id?: string } };
     if (!response.ok || !body.access_token || !body.user?.id) {
-      const providerError = body.error_code || body.error || body.msg || body.message || "unknown";
-      throw new AppError(401, "INVALID_LOGIN", "Email or password is incorrect.", {
-        providerStatus: response.status,
-        providerError: String(providerError).slice(0, 80),
-      });
+      throw new AppError(401, "INVALID_LOGIN", "Email or password is incorrect.");
     }
     return { accessToken: body.access_token, userId: body.user.id };
   }
