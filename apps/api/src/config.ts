@@ -31,7 +31,7 @@ export type AppConfig = {
 };
 
 function stringValue(env: NodeJS.ProcessEnv, key: string, fallback = ""): string {
-  return env[key]?.trim() || fallback;
+  return (env[key]?.trim() || fallback).replace(/^["']|["']$/g, "");
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
