@@ -157,8 +157,7 @@ export function createApp(runtime: AppRuntime): {
   }));
 
   app.get("/api/v1/marketplace/faces/:assetId", asyncHandler(async (req, res) => {
-    const cards = await assets.marketplace();
-    const card = cards.find((item) => item.assetId === req.params.assetId);
+    const card = await assets.marketplaceFace(String(req.params.assetId));
     if (!card) throw new AppError(404, "NOT_FOUND", "This likeness is not available.");
     res.json({ data: card });
   }));

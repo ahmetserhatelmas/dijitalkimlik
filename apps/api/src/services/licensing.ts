@@ -572,6 +572,10 @@ export class LicenseService {
     locale: Locale = "tr",
   ): Promise<LicenseAgreement> {
     const quote = quotePrice(context.version.rules, request.usage, locale);
+    const offered = request.usage.proposedAmountMinor;
+    const counter = offered != null && offered !== quote.amountMinor;
+    const amountMinor = counter ? offered : quote.amountMinor;
+    const formula = counter ? copy(locale).formula.counter : quote.formula;
     const settings = await repo.getSettings();
     const agreementId = newId();
     const licenseId = newId();
@@ -597,10 +601,10 @@ export class LicenseService {
       granted: { ...request.usage, downloadOriginal: true },
       restrictions: context.version.rules.prohibited,
       commercial: {
-        amountMinor: quote.amountMinor,
+        amountMinor,
         currency: quote.currency,
         pricingMode: quote.pricingMode,
-        formula: quote.formula,
+        formula,
       },
       renewalAllowed: context.version.rules.commercial.renewalAllowed,
       renewalRequiresNewAgreement: context.version.rules.commercial.renewalRequiresNewAgreement,
@@ -614,9 +618,9 @@ export class LicenseService {
       status: "draft",
       document,
       documentHash,
-      amountMinor: quote.amountMinor,
+      amountMinor,
       currency: quote.currency,
-      paymentRequired: settings.paymentRequired && quote.amountMinor > 0,
+      paymentRequired: settings.paymentRequired && amountMinor > 0,
       createdAt: timestamp,
       updatedAt: timestamp,
       activatedAt: null,

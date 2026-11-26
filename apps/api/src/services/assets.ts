@@ -14,6 +14,9 @@ export class AssetService {
     private readonly storage: StorageProvider,
   ) {}
 
+  private readonly signedUrls = new Map<string, { url: string; expiresAt: number }>();
+  private marketCache: { at: number; cards: Awaited<ReturnType<AssetService["loadMarketplace"]>> } | null = null;
+
   async upload(actor: Actor, input: { profileId: string; filename: string; bytes: Uint8Array; declaredType?: string; subject?: string; caption?: string }): Promise<FaceAsset> {
     await assertSelfOrScope(this.repo, actor, input.profileId, "upload_assets");
     const settings = await this.repo.getSettings();
@@ -181,13 +184,41 @@ export class AssetService {
   }
 
   async marketplace() {
+    if (this.marketCache && Date.now() - this.marketCache.at < 60_000) return this.marketCache.cards;
+    const cards = await this.loadMarketplace();
+    this.marketCache = { at: Date.now(), cards };
+    return cards;
+  }
+
+  async marketplaceFace(assetId: string) {
+    const cached = this.marketCache && Date.now() - this.marketCache.at < 60_000
+      ? this.marketCache.cards.find((card) => card.assetId === assetId)
+      : undefined;
+    if (cached) return cached;
+    const [card] = await this.loadMarketplace(assetId);
+    return card ?? null;
+  }
+
+  private async cachedSignedUrl(path: string): Promise<string | null> {
+    const hit = this.signedUrls.get(path);
+    if (hit && hit.expiresAt - Date.now() > 5 * 60_000) return hit.url;
+    try {
+      const url = await this.storage.getSignedUrl({ path, expiresInSeconds: 60 * 60 });
+      this.signedUrls.set(path, { url, expiresAt: Date.now() + 60 * 60 * 1000 });
+      return url;
+    } catch {
+      return null;
+    }
+  }
+
+  private async loadMarketplace(onlyAssetId?: string) {
     const [assets, profiles, ruleSets] = await Promise.all([
-      this.repo.listAssets(),
+      onlyAssetId ? this.repo.getAsset(onlyAssetId).then((asset) => (asset ? [asset] : [])) : this.repo.listAssets(),
       this.repo.listProfiles(),
       this.repo.listRuleSets(),
     ]);
     await this.releasePublished(assets, ruleSets);
-    const cards = [];
+    const candidates = [];
     for (const asset of assets) {
       if (asset.removalStatus !== "active" || asset.listed === false) continue;
       if (asset.moderationStatus === "rejected" || asset.moderationStatus === "suspended" || asset.moderationStatus === "removed") continue;
@@ -196,31 +227,32 @@ export class AssetService {
       const ruleSet = ruleSets.find((item) => item.profileId === profile.id && item.assetId === asset.id && item.status === "published")
         ?? ruleSets.find((item) => item.profileId === profile.id && item.assetId === null && item.status === "published");
       if (!ruleSet?.currentVersionId) continue;
-      const version = await this.repo.getRuleVersion(ruleSet.currentVersionId);
-      if (!version) continue;
-      let imageUrl: string | null = null;
-      try {
-        imageUrl = await this.storage.getSignedUrl({ path: asset.storagePath, expiresInSeconds: 60 * 60 });
-      } catch {
-        imageUrl = null;
-      }
-      const subject = subjectOf(asset.subject);
-      cards.push({
-        assetId: asset.id,
-        profileId: profile.id,
-        displayName: profile.displayName,
-        bio: profile.bio,
-        location: profile.location,
-        place: profile.place,
-        appearance: profile.appearance ?? blankAppearance(),
+      candidates.push({ asset, profile, ruleSet, versionId: ruleSet.currentVersionId });
+    }
+    const versionIds = [...new Set(candidates.map((item) => item.versionId))];
+    const versions = await Promise.all(versionIds.map((id) => this.repo.getRuleVersion(id)));
+    const versionById = new Map(versions.flatMap((version, index) => (version ? [[versionIds[index], version] as const] : [])));
+    const imageUrls = await Promise.all(candidates.map((item) => this.cachedSignedUrl(item.asset.storagePath)));
+    return candidates.flatMap((item, index) => {
+      const version = versionById.get(item.versionId);
+      if (!version) return [];
+      const subject = subjectOf(item.asset.subject);
+      return [{
+        assetId: item.asset.id,
+        profileId: item.profile.id,
+        displayName: item.profile.displayName,
+        bio: item.profile.bio,
+        location: item.profile.location,
+        place: item.profile.place,
+        appearance: item.profile.appearance ?? blankAppearance(),
         subject,
-        caption: asset.caption?.trim() || profile.bio,
-        imageUrl,
-        ruleSetId: ruleSet.id,
+        caption: item.asset.caption?.trim() || item.profile.bio,
+        imageUrl: imageUrls[index] ?? null,
+        ruleSetId: item.ruleSet.id,
         ruleVersionNumber: version.versionNumber,
         permittedCategories: version.rules.permitted.categories,
         prohibitedCategories: version.rules.prohibited.categories,
-        customProhibitions: version.rules.prohibited.custom.map((item) => item.label),
+        customProhibitions: version.rules.prohibited.custom.map((rule) => rule.label),
         channels: version.rules.permitted.distributionChannels,
         territories: version.rules.permitted.territories,
         ai: version.rules.permitted.ai,
@@ -230,10 +262,9 @@ export class AssetService {
           currency: version.rules.commercial.currency,
           basePriceMinor: version.rules.commercial.basePriceMinor,
         },
-        previewAvailable: true,
-      });
-    }
-    return cards;
+        previewAvailable: true as const,
+      }];
+    });
   }
 
   private async releasePublished(assets: FaceAsset[], ruleSets?: Awaited<ReturnType<AppRepository["listRuleSets"]>>): Promise<void> {

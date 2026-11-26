@@ -29,10 +29,46 @@ function navigation(t: ReturnType<typeof useCopy>) {
   };
 }
 
+let cachedSession: Session | null | undefined = undefined;
+let sessionRequest: Promise<Session | null> | null = null;
+let sessionGeneration = 0;
+
+function loadSession(): Promise<Session | null> {
+  if (sessionRequest) return sessionRequest;
+  const generation = sessionGeneration;
+  sessionRequest = api<Session>("me")
+    .then((value) => {
+      if (generation !== sessionGeneration) return cachedSession ?? null;
+      cachedSession = value;
+      return value;
+    })
+    .catch(() => {
+      if (generation !== sessionGeneration) return cachedSession ?? null;
+      cachedSession = null;
+      return null;
+    })
+    .finally(() => {
+      if (generation === sessionGeneration) sessionRequest = null;
+    });
+  return sessionRequest;
+}
+
+export function clearSession() {
+  sessionGeneration += 1;
+  cachedSession = null;
+  sessionRequest = null;
+}
+
 export function useSession() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [session, setSession] = useState<Session | null | undefined>(cachedSession);
   useEffect(() => {
-    api<Session>("me").then(setSession).catch(() => setSession(null));
+    let live = true;
+    loadSession().then((value) => {
+      if (live) setSession(value);
+    });
+    return () => {
+      live = false;
+    };
   }, []);
   return session;
 }
@@ -68,8 +104,10 @@ export function Dashboard({ children }: { children: React.ReactNode }) {
         <button
           className="mt-6 text-sm text-muted"
           onClick={async () => {
+            clearSession();
             await fetch("/api/auth/logout", { method: "POST" });
             router.push("/");
+            router.refresh();
           }}
         >{t.dash.signOut}</button>
       </aside>

@@ -64,7 +64,7 @@ export function CastGrid({ cards, labels, placeLabels, noMatch }: { cards: CastC
       {shown.length === 0 && <p className="mt-8 text-muted">{noMatch}</p>}
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((card) => (
-          <Link key={card.assetId} href={`/marketplace/${card.assetId}`} className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-accent">
+          <Link key={card.assetId} href={`/marketplace/${card.assetId}`} prefetch className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-accent">
             {card.imageUrl ? (
               <img src={card.imageUrl} alt={card.caption || card.displayName} className="aspect-[4/5] w-full object-cover" />
             ) : (

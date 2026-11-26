@@ -23,6 +23,7 @@ import {
   type Appearance,
   fill,
   formatMinor,
+  type Currency,
   groupDigits,
   term,
   violationText,
@@ -916,14 +917,16 @@ function moneyMinor(value: string): number | null {
   return Math.round(lira * 100);
 }
 
-export function DiscoverRequest({ assetId, channels = [], territories = [], categories = [], suggestedAmount = "" }: { assetId?: string; channels?: string[]; territories?: string[]; categories?: string[]; allowDownload?: boolean; suggestedAmount?: string }) {
+export function DiscoverRequest({ assetId, channels = [], territories = [], categories = [], suggestedAmount = "", currency = "TRY" }: { assetId?: string; channels?: string[]; territories?: string[]; categories?: string[]; allowDownload?: boolean; suggestedAmount?: string; currency?: Currency }) {
   const t = useCopy();
   const locale = useLocale();
   const router = useRouter();
   const [companyName, setCompanyName] = useState("Dijital Kimlik");
   const [result, setResult] = useState<string>("");
   const [error, setError] = useState("");
-  const [amount, setAmount] = useState(() => moneyText(suggestedAmount.replace(".", ",")));
+  const listedText = suggestedAmount ? moneyText(suggestedAmount.replace(".", ",")) : "";
+  const [counterOffer, setCounterOffer] = useState(false);
+  const [amount, setAmount] = useState(listedText);
   const startsOn = new Date().toISOString().slice(0, 10);
   const end = new Date();
   end.setFullYear(end.getFullYear() + 1);
@@ -944,7 +947,8 @@ export function DiscoverRequest({ assetId, channels = [], territories = [], cate
           setError(t.discover.pickListing);
           return;
         }
-        const amountMinor = moneyMinor(amount);
+        const payingText = counterOffer || !listedText ? amount : listedText;
+        const amountMinor = moneyMinor(payingText);
         if (amountMinor === null) {
           setError(t.discover.amountInvalid);
           return;
@@ -1013,8 +1017,17 @@ export function DiscoverRequest({ assetId, channels = [], territories = [], cate
         <label className="text-sm">{t.discover.ends}<input className={field} type="date" name="endsOn" required defaultValue={endsOn} /></label>
       </div>
       <label className="block text-sm">{t.discover.intended}<textarea className={field} name="intendedUse" required minLength={10} /></label>
-      <label className="block text-sm">{t.discover.amount}<input className={field} name="amount" inputMode="decimal" autoComplete="off" spellCheck={false} placeholder="9.500" value={amount} onChange={(event) => setAmount(moneyText(event.target.value))} required /></label>
-      <button className="rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white" type="submit">{t.discover.submit}</button>
+      {listedText && !counterOffer && <p className="text-sm">{fill(t.discover.acceptPrice, { amount: formatMinor(moneyMinor(listedText) ?? 0, currency) })}</p>}
+      {listedText && (
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={counterOffer} onChange={(event) => setCounterOffer(event.target.checked)} />
+          {t.discover.newOffer}
+        </label>
+      )}
+      {(counterOffer || !listedText) && (
+        <label className="block text-sm">{t.discover.amount}<input className={field} name="amount" inputMode="decimal" autoComplete="off" spellCheck={false} placeholder="9.500" value={amount} onChange={(event) => setAmount(moneyText(event.target.value))} required /></label>
+      )}
+      <button className="rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white" type="submit">{listedText && !counterOffer ? t.discover.payListed : t.discover.submit}</button>
       {result && <Notice>{result}</Notice>}
       {error && <ErrorText>{error}</ErrorText>}
     </form>

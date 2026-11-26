@@ -1,11 +1,8 @@
 import { notFound } from "next/navigation";
 import { formatMinor, formatPlace, term, type Appearance, type Currency, type Place } from "@suret/shared";
 import { DiscoverRequest } from "@/components/workspace";
-import { SiteFooter, SiteHeader } from "@/components/shell";
 import { apiOrigin } from "@/lib/api";
 import { getCopy, getLocale } from "@/lib/locale-server";
-
-export const dynamic = "force-dynamic";
 
 type Card = {
   assetId: string;
@@ -27,7 +24,7 @@ type Card = {
 
 export default async function FacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const response = await fetch(`${apiOrigin()}/api/v1/marketplace/faces/${id}`, { cache: "no-store" }).catch(() => null);
+  const response = await fetch(`${apiOrigin()}/api/v1/marketplace/faces/${id}`, { next: { revalidate: 20 } }).catch(() => null);
   if (!response || response.status === 404 || !response.ok) notFound();
   const card = (await response.json()).data as Card;
   const t = await getCopy();
@@ -42,9 +39,7 @@ export default async function FacePage({ params }: { params: Promise<{ id: strin
     ...card.customProhibitions,
   ];
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto max-w-5xl px-5 py-16">
+    <main className="mx-auto max-w-5xl px-5 py-16">
         <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
           {card.imageUrl ? (
             <img src={card.imageUrl} alt={card.caption || card.displayName} className="min-h-80 w-full rounded-3xl object-cover" />
@@ -65,7 +60,7 @@ export default async function FacePage({ params }: { params: Promise<{ id: strin
               <h2 className="text-2xl">{t.marketplace.requestTitle}</h2>
               <p className="mt-2 text-sm text-muted">{t.marketplace.requestLede}</p>
               <div className="mt-4">
-                <DiscoverRequest assetId={card.assetId} channels={card.channels} territories={card.territories} categories={card.permittedCategories} suggestedAmount={card.commercial.basePriceMinor != null ? String(card.commercial.basePriceMinor / 100) : ""} />
+                <DiscoverRequest assetId={card.assetId} channels={card.channels} territories={card.territories} categories={card.permittedCategories} suggestedAmount={card.commercial.basePriceMinor != null ? String(card.commercial.basePriceMinor / 100) : ""} currency={card.commercial.currency} />
               </div>
             </div>
           </div>
@@ -90,9 +85,7 @@ export default async function FacePage({ params }: { params: Promise<{ id: strin
             </ul>
           </section>
         </div>
-      </main>
-      <SiteFooter />
-    </>
+    </main>
   );
 }
 
