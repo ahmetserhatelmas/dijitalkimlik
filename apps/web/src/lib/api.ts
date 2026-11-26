@@ -30,4 +30,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   return payload.data as T;
 }
 
-export const apiBase = process.env.API_PUBLIC_URL ?? "http://localhost:4000";
+export function apiOrigin(): string {
+  const configured = process.env["API_PUBLIC_URL"];
+  return (configured && configured.trim() ? configured : "http://localhost:4000").replace(/\/$/, "");
+}

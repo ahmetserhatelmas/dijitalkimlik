@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { term } from "@suret/shared";
 import { SiteFooter, SiteHeader } from "@/components/shell";
+import { apiOrigin } from "@/lib/api";
 import { getCopy, getLocale } from "@/lib/locale-server";
 import { VerifyForm } from "./form";
 
@@ -45,7 +46,7 @@ export default async function VerifyPage({
   let result: Verification | null = null;
   let error = "";
   const response = await fetch(
-    `${process.env.API_PUBLIC_URL ?? "http://localhost:4000"}/api/v1/verification/${licenseId}${query}`,
+    `${apiOrigin()}/api/v1/verification/${licenseId}${query}`,
     { cache: "no-store", headers: { "accept-language": locale } },
   ).catch(() => null);
   if (!response) error = t.verify.unavailable;

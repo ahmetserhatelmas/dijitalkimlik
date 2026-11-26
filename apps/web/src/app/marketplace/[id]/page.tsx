@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { formatMinor, term, type Appearance, type Currency } from "@suret/shared";
 import { DiscoverRequest } from "@/components/workspace";
 import { SiteFooter, SiteHeader } from "@/components/shell";
-import { apiBase } from "@/lib/api";
+import { apiOrigin } from "@/lib/api";
 import { getCopy, getLocale } from "@/lib/locale-server";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ type Card = {
 
 export default async function FacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const response = await fetch(`${apiBase}/api/v1/marketplace/faces/${id}`, { cache: "no-store" }).catch(() => null);
+  const response = await fetch(`${apiOrigin()}/api/v1/marketplace/faces/${id}`, { cache: "no-store" }).catch(() => null);
   if (!response || response.status === 404 || !response.ok) notFound();
   const card = (await response.json()).data as Card;
   const t = await getCopy();

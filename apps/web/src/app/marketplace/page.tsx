@@ -1,7 +1,7 @@
 import { formatMinor, term, type Appearance, type Currency } from "@suret/shared";
 import { CastGrid } from "@/components/cast-grid";
 import { PageIntro, SiteFooter, SiteHeader } from "@/components/shell";
-import { apiBase } from "@/lib/api";
+import { apiOrigin } from "@/lib/api";
 import { getCopy, getLocale } from "@/lib/locale-server";
 
 type Card = {
@@ -31,7 +31,7 @@ export default async function MarketplacePage() {
   let cards: Card[] = [];
   let unavailable = false;
   try {
-    const response = await fetch(`${apiBase}/api/v1/marketplace/faces`, { cache: "no-store" });
+    const response = await fetch(`${apiOrigin()}/api/v1/marketplace/faces`, { cache: "no-store" });
     if (!response.ok) unavailable = true;
     else cards = (await response.json()).data;
   } catch {

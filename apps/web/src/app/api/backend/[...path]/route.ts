@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { apiOrigin } from "@/lib/api";
 
 const methods = ["GET", "POST", "PATCH", "PUT", "DELETE"] as const;
 
@@ -6,7 +7,7 @@ async function proxy(request: Request, context: { params: Promise<{ path: string
   const { path } = await context.params;
   const token = (await cookies()).get("suret_token")?.value;
   const incoming = new URL(request.url);
-  const target = `${process.env.API_PUBLIC_URL ?? "http://localhost:4000"}/api/v1/${path.join("/")}${incoming.search}`;
+  const target = `${apiOrigin()}/api/v1/${path.join("/")}${incoming.search}`;
   const headers = new Headers();
   if (token) headers.set("authorization", `Bearer ${token}`);
   const contentType = request.headers.get("content-type");
