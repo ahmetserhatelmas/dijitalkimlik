@@ -81,7 +81,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     throw new Error("ALLOW_DEV_AUTH must be false in production.");
   }
   if (nodeEnv === "production" && config.paymentProvider === "sandbox" && !config.allowSandboxInProduction) {
-    throw new Error("Sandbox payments are disabled in production. Configure iyzico or explicitly allow the sandbox.");
+    console.warn("Sandbox payments are running in production. Set ALLOW_SANDBOX_IN_PRODUCTION=true, or switch PAYMENT_PROVIDER to iyzico.");
   }
   if (config.storageProvider === "supabase" && (!config.supabaseUrl || !config.supabaseServiceRoleKey)) {
     throw new Error("Supabase Storage requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");

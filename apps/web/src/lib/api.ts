@@ -31,6 +31,10 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export function apiOrigin(): string {
-  const configured = process.env["API_PUBLIC_URL"];
-  return (configured && configured.trim() ? configured : "http://localhost:4000").replace(/\/$/, "");
+  const bound = process.env["SURET_API_URL"]?.trim();
+  if (bound) return bound.replace(/\/$/, "");
+  const configured = process.env["API_PUBLIC_URL"]?.trim();
+  if (configured && process.env["NODE_ENV"] !== "production") return configured.replace(/\/$/, "");
+  if (configured && !/localhost|127\.0\.0\.1/.test(configured)) return configured.replace(/\/$/, "");
+  return "http://localhost:4000";
 }

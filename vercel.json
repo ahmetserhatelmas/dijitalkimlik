@@ -9,7 +9,7 @@
           "type": "service",
           "service": "api",
           "format": "url",
-          "env": "API_PUBLIC_URL"
+          "env": "SURET_API_URL"
         }
       ]
     },
