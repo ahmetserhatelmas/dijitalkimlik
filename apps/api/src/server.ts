@@ -18,10 +18,13 @@ import { SupabaseStorageService } from "./storage/supabase.js";
 loadEnvFile();
 
 const app = await start();
-const port = Number(process.env.PORT || process.env.API_PORT || 4000);
-app.listen(port, () => {
-  console.log(`Suret API listening on port ${port}`);
-});
+
+if (!process.env.VERCEL) {
+  const port = Number(process.env.PORT || process.env.API_PORT || 4000);
+  app.listen(port, () => {
+    console.log(`Suret API listening on port ${port}`);
+  });
+}
 
 export default app;
 
@@ -40,7 +43,8 @@ async function start(): Promise<express.Express> {
           callbackUrl: config.iyzicoCallbackUrl,
         })
       : new SandboxPaymentProvider(config.paymentWebhookSecret, config.apiPublicUrl);
-    const chain = config.blockchainRpcUrl && config.blockchainContractAddress && config.blockchainSignerPrivateKey
+    const localChain = /localhost|127\.0\.0\.1/.test(config.blockchainRpcUrl);
+    const chain = config.blockchainRpcUrl && config.blockchainContractAddress && config.blockchainSignerPrivateKey && !(process.env.VERCEL && localChain)
       ? new EthersChainClient(config.blockchainRpcUrl, config.blockchainChainId, config.blockchainContractAddress, config.blockchainSignerPrivateKey)
       : new UnconfiguredChainClient();
 

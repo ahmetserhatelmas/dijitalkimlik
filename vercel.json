@@ -20,6 +20,12 @@
   },
   "rewrites": [
     {
+      "source": "/api/v1/health",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
       "source": "/(.*)",
       "destination": {
         "service": "web"
