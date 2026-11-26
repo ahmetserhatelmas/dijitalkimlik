@@ -1,4 +1,5 @@
 import type { RuleViolation } from "./domain";
+import { COUNTRIES } from "./places";
 
 export const LOCALES = ["tr", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
@@ -1486,6 +1487,10 @@ export function fill(template: string, params: Record<string, string | number> =
 }
 
 export function term(locale: Locale, group: "categories" | "prohibitions" | "ai" | "channels" | "territories" | "statuses" | "pricingModes", id: string): string {
+  if (group === "territories") {
+    const country = COUNTRIES.find((item) => item.code === id);
+    if (country) return country[locale];
+  }
   const table = copy(locale)[group] as Record<string, string>;
   return table[id] ?? id.replaceAll("_", " ");
 }

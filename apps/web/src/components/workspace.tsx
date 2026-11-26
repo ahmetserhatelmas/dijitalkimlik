@@ -419,8 +419,30 @@ export function RuleEditor() {
           ))}
         </div>
       </fieldset>
+      <fieldset>
+        <legend className="text-sm font-semibold">{t.rules.territories}</legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {[...COUNTRIES.map((country) => country.code), ...rules.permitted.territories.filter((code) => !COUNTRIES.some((country) => country.code === code))].map((code) => (
+            <label key={code} className="flex gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={rules.permitted.territories.includes(code)}
+                onChange={() => setRules((current) => ({
+                  ...current,
+                  permitted: {
+                    ...current.permitted,
+                    territories: current.permitted.territories.includes(code)
+                      ? current.permitted.territories.filter((item) => item !== code)
+                      : [...current.permitted.territories, code],
+                  },
+                }))}
+              />
+              {term(locale, "territories", code)}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="grid gap-3 md:grid-cols-2">
-        <label className="text-sm">{t.rules.territories}<input className={field} value={rules.permitted.territories.join(", ")} onChange={(event) => setRules((current) => ({ ...current, permitted: { ...current.permitted, territories: splitList(event.target.value) } }))} /></label>
         <label className="text-sm">{t.rules.maxDays}<input className={field} inputMode="numeric" value={rules.permitted.maxDurationDays ?? ""} onChange={(event) => {
           const digits = event.target.value.replace(/\D/g, "");
           setRules((current) => ({ ...current, permitted: { ...current.permitted, maxDurationDays: digits ? Number(digits) : null } }));
@@ -1290,8 +1312,4 @@ function formatDay(value: string, locale: string): string {
   if (!match) return value;
   const [, year, month, day] = match;
   return locale === "en" ? `${month}/${day}/${year}` : `${day}.${month}.${year}`;
-}
-
-function splitList(value: string): string[] {
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
