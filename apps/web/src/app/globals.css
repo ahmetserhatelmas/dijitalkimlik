@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Figtree", "Avenir Next", sans-serif;
+  --font-sans: "Figtree", "Avenir Next", sans-serif;
+  --color-canvas: #ffffff;
+  --color-canvas-deep: #f4effc;
+  --color-ink: #1c1230;
+  --color-muted: #6d6480;
+  --color-line: #e6def3;
+  --color-card: #ffffff;
+  --color-accent: #6d28d9;
+  --color-accent-deep: #5b21b6;
+  --color-teal: #6d28d9;
+  --color-teal-soft: #f3e8ff;
+  --color-danger: #be123c;
+  --color-ok: #3f6212;
+  --color-warn: #92400e;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, .serif { font-family: var(--font-sans); font-weight: 650; letter-spacing: -0.035em; }
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+.paper {
+  background:
+    radial-gradient(900px 420px at 100% -10%, rgba(109, 40, 217, 0.08), transparent 55%),
+    #ffffff;
+}

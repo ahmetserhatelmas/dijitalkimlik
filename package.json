@@ -1,0 +1,24 @@
+{
+  "name": "suret",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Suret — face and likeness licensing platform",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:api": "pnpm --filter @suret/api dev",
+    "dev:web": "pnpm --filter @suret/web dev",
+    "dev:mobile": "pnpm --filter @suret/mobile dev",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "build": "turbo build"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2"
+  }
+}

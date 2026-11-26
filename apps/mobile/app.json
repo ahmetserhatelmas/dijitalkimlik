@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Suret",
+    "slug": "suret",
+    "scheme": "suret",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.suret.likeness",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Suret uses the camera so you can photograph a likeness you are authorized to license.",
+        "NSPhotoLibraryUsageDescription": "Suret uses your photo library so you can upload a likeness you are authorized to license."
+      }
+    },
+    "android": {
+      "package": "com.suret.likeness",
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Suret uses your photo library so you can upload a likeness you are authorized to license.",
+          "cameraPermission": "Suret uses the camera so you can photograph a likeness you are authorized to license."
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

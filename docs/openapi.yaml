@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: Suret API
+  version: 0.1.0
+  description: Likeness licensing API. See docs/api.md for the workflow notes.
+servers:
+  - url: http://localhost:4000/api/v1
+paths:
+  /health:
+    get:
+      responses:
+        "200":
+          description: Integration status without secrets
+  /auth/register:
+    post:
+      responses:
+        "201":
+          description: Account created
+  /auth/login:
+    post:
+      responses:
+        "200":
+          description: Session token
+  /license-requests:
+    post:
+      responses:
+        "201":
+          description: Compatible request and draft agreement
+        "422":
+          description: Request blocked. No agreement is created.
+  /license-requests/preview:
+    post:
+      responses:
+        "200":
+          description: Compatibility result
+  /agreements/{id}/consent:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Consent recorded
+  /agreements/{id}/sign:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Development signature recorded
+  /payments/webhooks/sandbox:
+    post:
+      responses:
+        "200":
+          description: Signed webhook accepted
+        "401":
+          description: Signature rejected
+  /licenses/{licenseId}/blockchain:
+    post:
+      parameters:
+        - name: licenseId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Chain record confirmed and license activated
+        "502":
+          description: Recording failed. License is not active.
+  /verification/{licenseId}:
+    get:
+      parameters:
+        - name: licenseId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: agreementHash
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Hash comparison and current platform status
+  /misuse-reports:
+    post:
+      responses:
+        "201":
+          description: Report stored

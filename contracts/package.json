@@ -1,0 +1,19 @@
+{
+  "name": "@suret/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "hardhat test",
+    "chain": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "typecheck": "tsc --noEmit --pretty false",
+    "lint": "tsc --noEmit --pretty false"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/chai": "^5.2.2",
+    "@types/node": "^24.5.2",
+    "hardhat": "^2.26.3",
+    "typescript": "^5.9.2"
+  }
+}
